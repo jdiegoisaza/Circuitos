@@ -1,0 +1,146 @@
+// Pines digitales usados Arduino para encender
+// los correspondientes segmentos LED del display
+#define A 2
+#define B 3
+#define C 4
+#define D 5
+#define E 6
+#define DF 7
+#define G 8
+#define D1 9
+#define D2 10
+#define D3 11
+#define D4 12
+#define P1 14
+#define P2 15
+#define P3 16
+#define P4 17
+int val = 0; //val se emplea para almacenar el estado del boton 1
+int state = 0; // 0 muestra hora, mientras que 1 muestra segundos
+int old_val = 0; // almacena el antiguo valor de val
+int val2 = 0; //val se emplea para almacenar el estado del boton 1
+int state2 = 0; // 0 muestra hora, mientras que 1 muestra segundos
+int old_val2 = 0; // almacena el antiguo valor de val
+int val3 = 0; //val se emplea para almacenar el estado del boton 1
+int state3 = 0; // 0 muestra hora, mientras que 1 muestra segundos
+int old_val3 = 0; // almacena el antiguo valor de val
+int val4 = 0; //val se emplea para almacenar el estado del boton 1
+int state4 = 0; // 0 muestra hora, mientras que 1 muestra segundos
+int old_val4 = 0; // almacena el antiguo valor de val
+int hora;
+int minuto;
+int segundo;
+// Pines para A B C D E F G, en secuencia
+// se pueden usar los que más interesen
+const int segs[7] = { A, B, C, D, E, DF, G};
+int cnt = 0;
+// Segments that make each number
+const byte numbers[10] = {
+  0b0111111,  // 0 en 7seg
+  0b0000110,  // 0 en 7seg
+  0b1011011,
+  0b1001111,
+  0b1100110,
+  0b1101101,
+  0b1111101,
+  0b0000111,
+  0b1111111,
+  0b1101111
+};
+void setup() {
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(E, OUTPUT);
+  pinMode(DF, OUTPUT);
+  pinMode(G, OUTPUT);
+  pinMode(D1, OUTPUT);
+  pinMode(D2, OUTPUT);
+  pinMode(D3, OUTPUT);
+  pinMode(D4, OUTPUT);
+  pinMode(P1, INPUT);
+  pinMode(P2, INPUT);
+  pinMode(P3, INPUT);
+  pinMode(P4, INPUT);
+  digitalWrite(D1, LOW);
+  digitalWrite(D2, LOW);
+  digitalWrite(D3, LOW);
+  digitalWrite(D4, LOW);
+  Serial.begin(9600);
+}
+void loop() {
+  if(segundo>59){
+    minuto++;
+    segundo=segundo-60;
+  }
+  if(minuto>59){
+    hora++;
+    minuto=minuto-60;
+  }
+  if(segundo>59){
+    minuto++;
+    segundo=segundo-60;
+  }
+   val= digitalRead(P1); // lee el estado del Boton
+  if ((val == HIGH) && (old_val == LOW)){
+  state=state + 1;
+  state = state%3;
+  delay(10);
+  }
+    old_val = val; // valor del antiguo estado
+  if (state==1){    
+   alumbraled1((minute() / 10)+minuto);
+   alumbraled2((minute() % 10)+minuto);
+   alumbraled3((second() / 10)+segundo);
+   alumbraled4((second() % 10)+segundo);
+  }
+  else{if (state==2){
+    alumbraled2(second() / 10);
+  }
+  else{
+   alumbraled1((hour() / 10)+hora);
+   alumbraled2((hour() % 10)+hora);
+   alumbraled3((minute() / 10)minuto);
+   alumbraled4((minute() % 10)minuto);
+  }
+  }
+}
+
+
+byte decoBCD7seg(int number) {
+  return ~numbers[number];
+}
+void alumbraled1(int number) {
+  digitalWrite(D1, HIGH);
+  lightSegments(decoBCD7seg(number));
+  delay(5);
+  digitalWrite(D1, LOW);
+}
+void alumbraled2(int number) {
+  digitalWrite(D2, HIGH);
+  lightSegments(decoBCD7seg(number));
+  delay(5);
+  digitalWrite(D2, LOW);
+}
+void alumbraled3(int number) {
+  digitalWrite(D3, HIGH);
+  lightSegments(decoBCD7seg(number));
+  delay(5);
+  digitalWrite(D3, LOW);
+}
+void alumbraled4(int number) {
+  digitalWrite(D4, HIGH);
+  lightSegments(decoBCD7seg(number));
+  delay(5);
+  digitalWrite(D4, LOW);
+}
+void lightSegments(byte number)
+{
+  for (int i = 0; i < 7; i++)
+  {
+    int bit = bitRead(number, i);
+    digitalWrite(segs[i], bit);
+  }
+}
+
