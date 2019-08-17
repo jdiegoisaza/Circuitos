@@ -1,3 +1,7 @@
+#include <TimeLib.h>
+#include <Time.h>
+
+
 // Pines digitales usados Arduino para encender
 // los correspondientes segmentos LED del display
 #define A 2
@@ -27,9 +31,9 @@ int old_val3 = 0; // almacena el antiguo valor de val
 int val4 = 0; //val se emplea para almacenar el estado del boton 1
 int state4 = 0; // 0 muestra hora, mientras que 1 muestra segundos
 int old_val4 = 0; // almacena el antiguo valor de val
-int hora;
-int minuto;
-int segundo;
+int hora=0;
+int minuto=0;
+int segundo=0;
 // Pines para A B C D E F G, en secuencia
 // se pueden usar los que más interesen
 const int segs[7] = { A, B, C, D, E, DF, G};
@@ -89,20 +93,50 @@ void loop() {
   delay(10);
   }
     old_val = val; // valor del antiguo estado
+    val2= digitalRead(P2); // lee el estado del Boton
+  if ((val2 == HIGH) && (old_val2 == LOW)){
+  state2=1-state2;
+  delay(10);
+  }
+    old_val2 = val2; // valor del antiguo estado
+    val3= digitalRead(P3); // lee el estado del Boton
+  if ((val3 == HIGH) && (old_val3 == LOW)){
+  state3=1-state3;
+  delay(10);
+  }
+    old_val3 = val3; // valor del antiguo estado
+    val4= digitalRead(P4); // lee el estado del Boton
+  if ((val4 == HIGH) && (old_val4 == LOW)){
+  state4=1-state4;
+  delay(10);
+  }
+    old_val4 = val4; // valor del antiguo estado
   if (state==1){    
    alumbraled1((minute() / 10)+minuto);
    alumbraled2((minute() % 10)+minuto);
    alumbraled3((second() / 10)+segundo);
    alumbraled4((second() % 10)+segundo);
+   minuto++;
   }
   else{if (state==2){
-    alumbraled2(second() / 10);
+    if (state2==1){    
+   alumbraled1((minute() / 10)+minuto);
+   alumbraled2((minute() % 10)+minuto);
+   alumbraled3((second() / 10)+segundo);
+   alumbraled4((second() % 10)+segundo);
   }
   else{
    alumbraled1((hour() / 10)+hora);
    alumbraled2((hour() % 10)+hora);
-   alumbraled3((minute() / 10)minuto);
-   alumbraled4((minute() % 10)minuto);
+   alumbraled3((minute() / 10)+minuto);
+   alumbraled4((minute() % 10)+minuto);    
+  }}
+  else{
+   alumbraled1((hour() / 10)+hora);
+   alumbraled2((hour() % 10)+hora);
+   alumbraled3((minute() / 10)+minuto);
+   alumbraled4((minute() % 10)+minuto);
+   hora++;
   }
   }
 }
@@ -143,4 +177,3 @@ void lightSegments(byte number)
     digitalWrite(segs[i], bit);
   }
 }
-
